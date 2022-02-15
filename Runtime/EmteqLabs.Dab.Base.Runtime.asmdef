@@ -1,9 +1,9 @@
 {
-    "name": "EmteqLabs.Dab.Base.Editor",
+    "name": "EmteqLabs.Dab.Base.Runtime",
     "references": [],
     "optionalUnityReferences": [],
     "includePlatforms": [
-        "Editor"
+        "Android"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

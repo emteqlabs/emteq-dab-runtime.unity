@@ -1,7 +1,9 @@
-{
-    "name": "EmteqLabs.Dab.Base.Editor",
-    "references": [],
-    "optionalUnityReferences": [],
+{	
+	"name": "EmteqLabs.Dab.Base",
+    "references": [
+        "EmteqLabs.Dab.Base.iOS",
+        "EmteqLabs.Dab.Base.Android"
+    ],
     "includePlatforms": [
         "Editor"
     ],
