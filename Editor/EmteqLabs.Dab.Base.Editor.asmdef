@@ -1,8 +1,7 @@
 {	
 	"name": "EmteqLabs.Dab.Base",
     "references": [
-        "EmteqLabs.Dab.Base.iOS",
-        "EmteqLabs.Dab.Base.Android"
+        "EmteqLabs.Dab.Base.Mobile"
     ],
     "includePlatforms": [
         "Editor"
