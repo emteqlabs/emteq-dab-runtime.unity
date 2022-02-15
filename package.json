@@ -1,0 +1,32 @@
+{
+  "name": "com.emteqlabs.unity.dab.base",
+  "version": "0.0.1",
+  "displayName": "EmteqLabs Unity::Base",
+  "description": "EmteqLabs Base SDK for Unity3D",
+  "unity": "2021.1",
+  "documentationUrl": "https://github.com/emteqlabs/emteqlabs.unity.dab.base/wiki",
+  "changelogUrl": "https://github.com/emteqlabs/emteqlabs.unity.dab.base/releases",
+  "licensesUrl": "https://TODO/licensing.html",
+  "dependencies": {
+  },
+  "hideInEditor": "false",
+  "keywords": [
+    "emteq",
+    "emteqlabs",
+    "DAB",
+    "emteqPRO",
+    "Android",
+    "Mobile",
+    "USB",
+    "Serial"
+  ],
+  "author": {
+    "name": "Craig Hutchinson",
+    "email": "craig.hutchinson@emteqlabs.com",
+    "url": "https://www.emteqlabs.com/"
+  },
+  "repository": {
+    "url": "https://github.com/emteqlabs/emteqlabs.unity.dab.base.git",
+    "type": "git"
+  }
+}
