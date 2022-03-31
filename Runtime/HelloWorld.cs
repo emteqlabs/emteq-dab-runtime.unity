@@ -8,7 +8,7 @@ namespace EmteqLabs.Unity.Dab.Base.Mobile
     {
         public void OnGUI()
         {
-            GUILayout.Label("Hello Unity-3d World!!!" + helloWorld_unity3d());
+            GUILayout.Label("Hello Unity-3d World!!!" + dabSdk_helloWorld());
         }
 
         // Start is called before the first frame update
@@ -23,23 +23,18 @@ namespace EmteqLabs.Unity.Dab.Base.Mobile
 
         }
 
-#if UNITY_IPHONE
-    // On iOS plugins are statically linked into
-    // the executable, so we have to use __Internal as the
-    // library name.
-    [DllImport ("__Internal")]
+#if UNITY_IPHONE // On iOS plugins are statically linked
+		[DllImport ("__Internal")]
 #else
-        // Other platforms load plugins dynamically, so pass the
-        // name of the plugin's dynamic library.
-        [DllImport("hello_unity3d")]
+        [DllImport("dabSdk")]
 #endif
-        private static extern float helloWorld_unity3d();
+        private static extern float dabSdk_helloWorld();
 
         void Awake()
         {
             // Calls the ExamplePluginFunction inside the plugin
             // And prints 5 to the console
-            print(helloWorld_unity3d());
+            print(dabSdk_helloWorld());
         }
     }
 
