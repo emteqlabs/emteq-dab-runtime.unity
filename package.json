@@ -1,6 +1,6 @@
 {
   "name": "com.emteqlabs.unity.dab.base",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "displayName": "EmteqLabs Unity::Base",
   "description": "EmteqLabs Base SDK for Unity3D",
   "unity": "2021.1",

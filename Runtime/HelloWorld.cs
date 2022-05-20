@@ -8,7 +8,7 @@ namespace EmteqLabs.Unity.Dab.Base.Mobile
     {
         public void OnGUI()
         {
-            GUILayout.Label("Hello Unity-3d World!!!" + dabSdk_helloWorld());
+            GUILayout.Label("Hello Unity-3d World!!!" + emteq_runtime_helloWorld());
         }
 
         // Start is called before the first frame update
@@ -23,18 +23,26 @@ namespace EmteqLabs.Unity.Dab.Base.Mobile
 
         }
 
+        /** Update is called at frame independent rate (default 0.02 seconds / 50hz)
+         * @note You can change the fixed time intervals from the Time section under the Project Settings.
+         */
+        void FixedUpdate()
+        {
+
+        }
+
 #if UNITY_IPHONE // On iOS plugins are statically linked
 		[DllImport ("__Internal")]
 #else
-        [DllImport("dabSdk")]
+        [DllImport("dabRuntime")]
 #endif
-        private static extern float dabSdk_helloWorld();
+        private static extern float emteq_runtime_helloWorld();
 
         void Awake()
         {
             // Calls the ExamplePluginFunction inside the plugin
             // And prints 5 to the console
-            print(dabSdk_helloWorld());
+            print(emteq_runtime_helloWorld());
         }
     }
 

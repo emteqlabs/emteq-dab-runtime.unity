@@ -1,12 +1,12 @@
 fileFormatVersion: 2
-guid: 505d28ba5025ce4449c4f64d523835ca
+guid: 83482b62d8de6ec4797f6f263fbeceb3
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
   defineConstraints: []
-  isPreloaded: 0
+  isPreloaded: 1
   isOverridable: 1
   isExplicitlyReferenced: 0
   validateReferences: 1
@@ -23,7 +23,6 @@ PluginImporter:
         Exclude WebGL: 0
         Exclude Win: 0
         Exclude Win64: 0
-        Exclude WindowsStoreApps: 0
   - first:
       Android: Android
     second:
@@ -48,7 +47,7 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU: None
+        CPU: AnyCPU
   - first:
       Standalone: OSXUniversal
     second:
@@ -72,16 +71,6 @@ PluginImporter:
     second:
       enabled: 1
       settings: {}
-  - first:
-      Windows Store Apps: WindowsStoreApps
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-        DontProcess: false
-        PlaceholderPath: 
-        SDK: AnySDK
-        ScriptingBackend: AnyScriptingBackend
   userData: 
   assetBundleName: 
   assetBundleVariant: 
