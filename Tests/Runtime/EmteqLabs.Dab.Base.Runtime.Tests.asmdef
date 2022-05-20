@@ -1,5 +1,5 @@
 {
-    "name": "EmteqLabs.Dab.Base.RuntimeTests",
+    "name": "Emteq.Device.Runtime.RuntimeTests",
     "references": [],
     "optionalUnityReferences": [
         "TestAssemblies"

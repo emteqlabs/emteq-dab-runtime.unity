@@ -34,7 +34,7 @@ namespace EmteqLabs.Unity.Dab.Base.Mobile
 #if UNITY_IPHONE // On iOS plugins are statically linked
 		[DllImport ("__Internal")]
 #else
-        [DllImport("dabRuntime")]
+        [DllImport("emteq-device-runtime")]
 #endif
         private static extern float emteq_runtime_helloWorld();
 

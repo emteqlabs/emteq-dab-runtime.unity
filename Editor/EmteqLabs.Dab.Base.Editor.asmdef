@@ -1,7 +1,7 @@
 {	
-	"name": "EmteqLabs.Dab.Base",
+	"name": "Emteq.Device.Runtime",
     "references": [
-        "EmteqLabs.Dab.Base.Mobile"
+        "Emteq.Device.Runtime.Mobile"
     ],
     "includePlatforms": [
         "Editor"

@@ -1,4 +1,4 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("EmteqLabs.Dab.Base.EditorTests")]
-[assembly: InternalsVisibleTo("EmteqLabs.Dab.Base.EditorPerformanceTests")]
+[assembly: InternalsVisibleTo("Emteq.Device.Runtime.EditorTests")]
+[assembly: InternalsVisibleTo("Emteq.Device.Runtime.EditorPerformanceTests")]

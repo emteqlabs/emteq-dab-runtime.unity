@@ -1,11 +1,11 @@
 {
-  "name": "com.emteqlabs.unity.dab.base",
-  "version": "0.0.3",
-  "displayName": "EmteqLabs Unity::Base",
-  "description": "EmteqLabs Base SDK for Unity3D",
-  "unity": "2021.1",
-  "documentationUrl": "https://github.com/emteqlabs/emteqlabs.unity.dab.base/wiki",
-  "changelogUrl": "https://github.com/emteqlabs/emteqlabs.unity.dab.base/releases",
+  "name": "com.emteq.device.runtime.unity",
+  "version": "0.0.4",
+  "displayName": "Emteq Device Runtime",
+  "description": "EmteqLabs Device Runtime Library for Unity3D",
+  "unity": "2019.1",
+  "documentationUrl": "https://github.com/emteqlabs/emteq-device-runtime.unity/wiki",
+  "changelogUrl": "https://github.com/emteqlabs/emteq-device-runtime.unity/releases",
   "licensesUrl": "https://TODO/licensing.html",
   "dependencies": {
   },
@@ -14,11 +14,13 @@
     "emteq",
     "emteqlabs",
     "DAB",
+    "Device",
     "emteqPRO",
     "Android",
     "Mobile",
     "USB",
-    "Serial"
+    "Serial",
+    "CDC"
   ],
   "author": {
     "name": "Craig Hutchinson",
@@ -26,7 +28,7 @@
     "url": "https://www.emteqlabs.com/"
   },
   "repository": {
-    "url": "https://github.com/emteqlabs/emteqlabs.unity.dab.base.git",
+    "url": "https://github.com/emteqlabs/emteq-device-runtime.unity.git",
     "type": "git"
   }
 }

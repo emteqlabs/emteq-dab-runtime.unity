@@ -1,6 +1,6 @@
 #pragma	once
 
-#include "dabruntime_export.h" //< Cmake generated
+#include "emteq-device-runtime_export.h" //< Cmake generated
 
 #if !(__STDC_VERSION__ >= 201112L || __cplusplus >= 201103L)
 #error "This header requires a C11 or C++11 compiler"
@@ -38,40 +38,40 @@ struct alignas(void*) EmteqRuntime_t
 #include <jni.h>
 /** [Android Only] The JVM is required to access USB subsystem under Android 
 */
-DABRUNTIME_EXPORT void emteq_api_setJvm(JavaVM* jvm);
+EMTEQ_DEVICE_RUNTIME_EXPORT void emteq_api_setJvm(JavaVM* jvm);
 #endif
 
-DABRUNTIME_EXPORT void emteq_api_version(int* major, int* minor, int* patch, int* commit);
+EMTEQ_DEVICE_RUNTIME_EXPORT void emteq_api_version(int* major, int* minor, int* patch, int* commit);
 
-DABRUNTIME_EXPORT char const* emteq_api_string( EmteqRetval_t retval );
+EMTEQ_DEVICE_RUNTIME_EXPORT char const* emteq_api_string( EmteqRetval_t retval );
 
 /** Check if the given runtime is a valid runtime instance i.e. Has called emteq_runtime_create(runtime)
  * @param runtime The runtime object to test for validity
  * @return True if the runtime has been instantiated, false if not or when `emteq_runtime_destroy(runtime)` has been called
 */
-DABRUNTIME_EXPORT bool emteq_runtime_isInstance(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isInstance(EmteqRuntime_t* runtime);
 
-DABRUNTIME_EXPORT EmteqRetval_t emteq_runtime_create(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_create(EmteqRuntime_t* runtime);
 
-DABRUNTIME_EXPORT EmteqRetval_t emteq_runtime_run(EmteqRuntime_t* runtime);
-DABRUNTIME_EXPORT bool emteq_runtime_isRunning(EmteqRuntime_t* runtime);
-DABRUNTIME_EXPORT EmteqRetval_t emteq_runtime_stop(EmteqRuntime_t* runtime);
-DABRUNTIME_EXPORT bool emteq_runtime_isStopping(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_run(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isRunning(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_stop(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isStopping(EmteqRuntime_t* runtime);
 
 
 /** Set the path at which data can be persisted/cached/saved
 * @param[in]  id   PathId to set
 * @param[in]  path  PathId uri
 */
-DABRUNTIME_EXPORT EmteqRetval_t emteq_runtime_setDataPath(EmteqRuntime_t* runtime, const EmteqPathId_t id, const char* path);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_setDataPath(EmteqRuntime_t* runtime, const EmteqPathId_t id, const char* path);
 
 /** Retrieve the options specified by `emteq_runtime_setDataPath` 
 */
-DABRUNTIME_EXPORT EmteqRetval_t emteq_runtime_getDataPath(EmteqRuntime_t* runtime, const EmteqPathId_t id, const char** path);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_getDataPath(EmteqRuntime_t* runtime, const EmteqPathId_t id, const char** path);
 
-DABRUNTIME_EXPORT EmteqRetval_t emteq_runtime_destroy(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_destroy(EmteqRuntime_t* runtime);
 
-DABRUNTIME_EXPORT float emteq_runtime_helloWorld();
+EMTEQ_DEVICE_RUNTIME_EXPORT float emteq_runtime_helloWorld();
 
 
 #if __linux || __ANDROID__
@@ -80,12 +80,12 @@ DABRUNTIME_EXPORT float emteq_runtime_helloWorld();
 * @ref https://stackoverflow.com/a/2760267
 * @return Socket descriptor or -1 on failure
 */
-DABRUNTIME_EXPORT int emteq_runtime_openRawSocket(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT int emteq_runtime_openRawSocket(EmteqRuntime_t* runtime);
 
 /** Close a socket opened via openRawSocket()
 *
 */
-DABRUNTIME_EXPORT void emteq_runtime_closeRawSocket(EmteqRuntime_t* runtime, int descriptor);
+EMTEQ_DEVICE_RUNTIME_EXPORT void emteq_runtime_closeRawSocket(EmteqRuntime_t* runtime, int descriptor);
 #endif
 
 #ifdef __cplusplus

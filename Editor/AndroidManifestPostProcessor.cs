@@ -5,7 +5,7 @@ using System.Xml;
 using UnityEditor;
 using UnityEditor.Android;
 
-namespace EmteqLabs.Dab.Base
+namespace Emteq.Device.Runtime
 {
     /// @TODO Better set of C# example code here https://stackoverflow.com/a/54894488/876651
     public class AndroidManifestPostProcessor : IPostGenerateGradleAndroidProject

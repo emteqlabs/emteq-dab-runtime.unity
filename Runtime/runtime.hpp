@@ -10,7 +10,7 @@
 #include <chrono> //< std::milliseconds
 #include <string_view> //< std::string_view
 
-#include "dabruntime_export.h" //< Cmake generated
+#include "emteq-device-runtime_export.h" //< Cmake generated
 #include "runtime.h" //< C defines reuse for interop
 
 #if 0 //< WIP
@@ -50,8 +50,8 @@ namespace runtime {
 
         /** Create the context object.
         */
-        DABRUNTIME_EXPORT Context();
-        DABRUNTIME_EXPORT ~Context();
+        EMTEQ_DEVICE_RUNTIME_EXPORT Context();
+        EMTEQ_DEVICE_RUNTIME_EXPORT ~Context();
 
         ///@{ Non-Copyable nor Movable
         Context(const Context&) = delete;
@@ -71,38 +71,38 @@ namespace runtime {
         * @param[in]  id   PathId to set
         * @param[in]  path  PathId uri
         */
-        DABRUNTIME_EXPORT void setPath(const PathId id, const std::filesystem::path& path );
+        EMTEQ_DEVICE_RUNTIME_EXPORT void setPath(const PathId id, const std::filesystem::path& path );
 
         /** Retrieve the options specified by `setPath`
         */
-        DABRUNTIME_EXPORT const std::filesystem::path& getPath( const PathId id);
+        EMTEQ_DEVICE_RUNTIME_EXPORT const std::filesystem::path& getPath( const PathId id);
 
         /** Polling runtime update
         * @param[in]  timeout  If the timeout is zero, returns immediately without blocking.
         * @warn Must be called regularily to update device interaction
         * @note call `run()` on separate thread is preferred(?)
         */
-        DABRUNTIME_EXPORT void update(const std::chrono::milliseconds timeout = std::chrono::milliseconds{ 0 } );
+        EMTEQ_DEVICE_RUNTIME_EXPORT void update(const std::chrono::milliseconds timeout = std::chrono::milliseconds{ 0 } );
 
         /**  Blocking execution, never returns on current thread until another thread calls stopExecute
         * @note Any prior unproceessed call to `stop()` will cause `run()` to exit immediately
         */
-        DABRUNTIME_EXPORT void run();
+        EMTEQ_DEVICE_RUNTIME_EXPORT void run();
 
         /** Check is a stop is pending on the context
         * @note Stop will be processed by the active or next call to `run()`
         */
-        DABRUNTIME_EXPORT bool isStopping() const noexcept;
+        EMTEQ_DEVICE_RUNTIME_EXPORT bool isStopping() const noexcept;
 
         /** Check for running state
         * @notice The thread calling `run()` may not yet be scheduled and check for `while(!isRunning()){}` may  be useful
         */
-        DABRUNTIME_EXPORT bool isRunning() const noexcept;
+        EMTEQ_DEVICE_RUNTIME_EXPORT bool isRunning() const noexcept;
 
         /** Stop 'run()` from another thread
         * @note Calling `stop()` will cause any proceeding `run()` to exit immediately
         */
-        DABRUNTIME_EXPORT void stop();
+        EMTEQ_DEVICE_RUNTIME_EXPORT void stop();
 
 #if __linux || __ANDROID__
         /** Create a new raw read-write socket to the DAB device
@@ -110,19 +110,19 @@ namespace runtime {
         * @ref https://stackoverflow.com/a/2760267
         * @return Socket descriptor or -1 on failure
         */
-        DABRUNTIME_EXPORT int openRawSocket();
+        EMTEQ_DEVICE_RUNTIME_EXPORT int openRawSocket();
 
         /** Close a socket opened via openRawSocket() 
         * 
         */
-        DABRUNTIME_EXPORT void closeRawSocket(int descriptor);
+        EMTEQ_DEVICE_RUNTIME_EXPORT void closeRawSocket(int descriptor);
 #endif
 
 #if 0 //< WIP
         /** Create a new raw read-write socket to the DAB device
         * @note This is  a unix domain socket on compatible platforms
         */
-        DABRUNTIME_EXPORT experimental::fdstream openDabFdStream();
+        EMTEQ_DEVICE_RUNTIME_EXPORT experimental::fdstream openDabFdStream();
 #endif
 
     private:

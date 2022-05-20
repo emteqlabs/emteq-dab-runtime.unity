@@ -1,7 +1,7 @@
 {
-    "name": "EmteqLabs.Dab.Base.EditorTests",
+    "name": "Emteq.Device.Runtime.EditorTests",
     "references": [
-        "EmteqLabs.Dab.Base.Editor",
+        "Emteq.Device.Runtime.Editor",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

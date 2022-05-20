@@ -1,5 +1,5 @@
 {
-    "name": "EmteqLabs.Dab.Base.Mobile",
+    "name": "Emteq.Device.Runtime.Mobile",
     "optionalUnityReferences": [],
     "includePlatforms": [
         "Android",
