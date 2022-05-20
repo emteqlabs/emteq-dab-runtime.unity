@@ -1,5 +1,5 @@
 {
-    "name": "Emteq.Device.Runtime.Mobile",
+    "name": "Emteq.Device.Runtime.Unity.Mobile",
     "optionalUnityReferences": [],
     "includePlatforms": [
         "Android",

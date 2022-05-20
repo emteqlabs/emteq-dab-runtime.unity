@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
 
-namespace EmteqLabs.Unity.Dab.Base.Mobile
+namespace Emteq.Device.Runtime.Unity.Mobile
 {
 
     public class HelloWorld : MonoBehaviour
