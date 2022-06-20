@@ -4,7 +4,6 @@
 #error "This header requires a C++11 compiler"
 #endif
 
-#include <filesystem> //< std::filesystem::path
 #include <cstdint> //< std::size_t
 #include <memory> //< std::unique_ptr
 #include <chrono> //< std::milliseconds
@@ -20,6 +19,9 @@
 namespace emteq {
 namespace runtime {
 
+    // @todo Proper remapping to CPP type
+    using RetVal = EmteqRetval_t;
+
     /** @note All values mapped for c-interop
     */
     enum class PathId : uint16_t
@@ -32,10 +34,19 @@ namespace runtime {
                 */
     };
 
+    using StreamHandle = EmteqStreamHandle_t; ///< Bring C type definityion in C++ namespace
+
+    /** @note All values mapped for c-interop
+    */
+    enum class StreamId : uint16_t
+    {
+        Raw = EMTEQ_STREAMID_RAW_DAB
+    };
+
     /**  Context object encapsulates all the global state associated with
     * emteq runtime library
     */
-    class Context final
+    class EMTEQ_DEVICE_RUNTIME_EXPORT Context final
     {
         struct Impl; //< Pimpl implementation
     private:
@@ -50,8 +61,8 @@ namespace runtime {
 
         /** Create the context object.
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT Context();
-        EMTEQ_DEVICE_RUNTIME_EXPORT ~Context();
+        Context();
+        ~Context();
 
         ///@{ Non-Copyable nor Movable
         Context(const Context&) = delete;
@@ -71,52 +82,95 @@ namespace runtime {
         * @param[in]  id   PathId to set
         * @param[in]  path  PathId uri
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT void setPath(const PathId id, const std::filesystem::path& path );
+        void setPath(const PathId id, const std::string_view path );
 
         /** Retrieve the options specified by `setPath`
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT const std::filesystem::path& getPath( const PathId id);
+        std::string_view getPath( const PathId id);
 
         /** Polling runtime update
         * @param[in]  timeout  If the timeout is zero, returns immediately without blocking.
         * @warn Must be called regularily to update device interaction
         * @note call `run()` on separate thread is preferred(?)
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT void update(const std::chrono::milliseconds timeout = std::chrono::milliseconds{ 0 } );
+        void update(const std::chrono::milliseconds timeout = std::chrono::milliseconds{ 0 } );
 
         /**  Blocking execution, never returns on current thread until another thread calls stopExecute
         * @note Any prior unproceessed call to `stop()` will cause `run()` to exit immediately
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT void run();
+        void run();
 
         /** Check is a stop is pending on the context
         * @note Stop will be processed by the active or next call to `run()`
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT bool isStopping() const noexcept;
+        bool isStopping() const noexcept;
 
         /** Check for running state
         * @notice The thread calling `run()` may not yet be scheduled and check for `while(!isRunning()){}` may  be useful
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT bool isRunning() const noexcept;
+        bool isRunning() const noexcept;
 
         /** Stop 'run()` from another thread
         * @note Calling `stop()` will cause any proceeding `run()` to exit immediately
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT void stop();
+        void stop();
 
-#if __linux || __ANDROID__
         /** Create a new raw read-write socket to the DAB device
         * @note This is  a unix domain socket on compatible platforms
         * @ref https://stackoverflow.com/a/2760267
-        * @return Socket descriptor or -1 on failure
+        * @return Socket descriptor
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT int openRawSocket();
+        StreamHandle openStream(const StreamId id);
 
-        /** Close a socket opened via openRawSocket() 
+        bool isRawSocket(StreamHandle descriptor);
+
+        /** Function for opening client socket
+         *
+         * @param timeoutMs The timeout for the operations, in milliseconds.
+         * If set to -1, operation is waiting indefinitely for the socket to open
+         * If set to 0, returns immediately
+         * Otherwise must be greater than 100 ms
+         * @todo: handle timeout better
+         * @todo: replace openStream
+         * @return The socket descriptor and status
+         */
+        EmteqRuntimeSocketStatus_t openStream(const StreamId id, const std::chrono::milliseconds timeoutMs);
+
+        /** Function for reading from client socket
+         *
+         * @param socketDescriptor The socket descriptor to be read from
+         * @param buffer The buffer to store the read data
+         * @param bufferSize The size of the buffer
+         * @param timeoutMs The timeout for the operations, in milliseconds.
+         * If set to -1, operation is waiting indefinitely for the socket to open
+         * If set to 0, returns immediately
+         * Otherwise must be greater than 100 ms
+         * @todo: handle timeout better
+         * @return The number of bytes read and status of the operation
+         */
+        EmteqRuntimeSocketIoStatus_t readStream(StreamHandle descriptor, char* bytes, const size_t bytesSize, const std::chrono::milliseconds timeoutMs);
+        
+        /** Function for writing to client socket
+         *
+         * @param socketDescriptor The socket descriptor to write data to
+         * @param buffer The buffer holding the data to be written
+         * @param bufferSize The size of the data to be written
+         * @param timeoutMs The timeout for the operations, in milliseconds.
+         * If set to -1, operation is waiting indefinitely for the socket to open
+         * If set to 0, returns immediately
+         * Otherwise must be greater than 100 ms
+         * @todo: handle timeout better
+         * @todo: multiple write transfers untill all data is written
+         * If set to -1, operation is waiting indefinitely for the socket to open
+         * @return The number of bytes written and status of the operation
+         */
+        EmteqRuntimeSocketIoStatus_t writeStream(StreamHandle descriptor, const char* bytes, const size_t bytesSize, const std::chrono::milliseconds timeoutMs);
+
+        /** Close a socket opened via openStream() 
         * 
         */
-        EMTEQ_DEVICE_RUNTIME_EXPORT void closeRawSocket(int descriptor);
-#endif
+        void closeRawSocket(StreamHandle descriptor);
+
 
 #if 0 //< WIP
         /** Create a new raw read-write socket to the DAB device
@@ -130,7 +184,6 @@ namespace runtime {
         Impl& impl() { return *impl_; }
 
     private:
-
         std::unique_ptr<Impl> impl_;
         uint32_t magicTag_ = MagicTag; //< @see MagicTag
     };

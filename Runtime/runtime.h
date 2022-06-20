@@ -6,42 +6,16 @@
 #error "This header requires a C11 or C++11 compiler"
 #endif 
 
+#include <cstdint> //< uint16_t, uintptr_t
+#include <cstddef> //< size_t
+
+#include "common.h" //< EmteqVersion_t, EmteqRuntime_t etc.
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-enum EmteqRetval_t
-{
-    EMTEQ_SUCCESS, //< No-Error
-    EMTEQ_INVALID_PARAMETER,
-    EMTEQ_INTERNAL_ERROR,
-    EMTEQ_INSUFFICIENT_RESOURCE
-};
-
-enum EmteqPathId_t
-{
-    EMTEQ_PATH_CACHE,  /**< Storage location for temporary cache files that are private to the running application
-                        * @note For Android `cachePath` corresponds to Activity Internal-DataPath
-                        */
-    EMTEQ_PATH_EXPORT,  /**< Storage location for exported / saved files
-                        * @note  For Android corresponds to Activity External-DataPath. This is world-readable and can be modified by the user when they enable USB mass storage
-                        */
-};
-
-struct alignas(void*) EmteqRuntime_t
-{
-    char _[32]; //< internal use
-};
-
-#if __ANDROID__
-#include <jni.h>
-/** [Android Only] The JVM is required to access USB subsystem under Android 
-*/
-EMTEQ_DEVICE_RUNTIME_EXPORT void emteq_api_setJvm(JavaVM* jvm);
-#endif
-
-EMTEQ_DEVICE_RUNTIME_EXPORT void emteq_api_version(int* major, int* minor, int* patch, int* commit);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqVersion_t emteq_api_version();
 
 EMTEQ_DEVICE_RUNTIME_EXPORT char const* emteq_api_string( EmteqRetval_t retval );
 
@@ -51,7 +25,17 @@ EMTEQ_DEVICE_RUNTIME_EXPORT char const* emteq_api_string( EmteqRetval_t retval )
 */
 EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isInstance(EmteqRuntime_t* runtime);
 
-EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_create(EmteqRuntime_t* runtime);
+/** Initialise the provided emteq runtime instance
+* @warning `runtime` should not already be created or shall have been destroyed via `emteq_runtime_destroy()`
+* @param[in]  sizeOfRuntime  Should be passed as sizeof(*runtime) for API runtime-compatiblity. * 
+* @return EMTEQ_SUCCESS successful context creation, emteq_runtime_destroy() should be called to release resource
+* @return EMTEQ_INVALID_PARAMETER runtime shall be a valid pointer
+* @return EMTEQ_INSUFFICIENT_RESOURCE sizeOfRuntime is not sufficient to instantiate the dynamically linked runtime, rebuild Application against latest emteq-device-runtime API
+* @return EMTEQ_INTERNAL_ERROR unexpected excep[tion thrown from C++ backend (TODO: Diagnostic)
+*/
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_create(EmteqRuntime_t* runtime, const size_t sizeOfRuntime );
+
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_destroy(EmteqRuntime_t* runtime);
 
 EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_run(EmteqRuntime_t* runtime);
 EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isRunning(EmteqRuntime_t* runtime);
@@ -69,24 +53,28 @@ EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_setDataPath(EmteqRuntime
 */
 EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_getDataPath(EmteqRuntime_t* runtime, const EmteqPathId_t id, const char** path);
 
-EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_destroy(EmteqRuntime_t* runtime);
 
 EMTEQ_DEVICE_RUNTIME_EXPORT float emteq_runtime_helloWorld();
 
 
-#if __linux || __ANDROID__
 /** Create a new raw read-write socket to the DAB device
 * @note This is  a unix domain socket on compatible platforms
 * @ref https://stackoverflow.com/a/2760267
 * @return Socket descriptor or -1 on failure
 */
-EMTEQ_DEVICE_RUNTIME_EXPORT int emteq_runtime_openRawSocket(EmteqRuntime_t* runtime);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRuntimeSocketStatus_t emteq_runtime_openStream(EmteqRuntime_t* runtime, const EmteqStreamId_t id, const int timeoutMs);
+
+EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isRawSocket(EmteqRuntime_t* runtime, EmteqStreamHandle_t descriptor);
 
 /** Close a socket opened via openRawSocket()
 *
 */
-EMTEQ_DEVICE_RUNTIME_EXPORT void emteq_runtime_closeRawSocket(EmteqRuntime_t* runtime, int descriptor);
-#endif
+EMTEQ_DEVICE_RUNTIME_EXPORT void emteq_runtime_closeRawSocket(EmteqRuntime_t* runtime, EmteqStreamHandle_t descriptor);
+
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRuntimeSocketIoStatus_t emteq_runtime_readStream(EmteqRuntime_t* runtime, EmteqStreamHandle_t descriptor, char* bytes, const size_t bytesSize, const int timeoutMs);
+
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRuntimeSocketIoStatus_t emteq_runtime_writeStream(EmteqRuntime_t* runtime, EmteqStreamHandle_t descriptor, const char* bytes, const size_t bytesSize, const int timeoutMs);
+
 
 #ifdef __cplusplus
 }
