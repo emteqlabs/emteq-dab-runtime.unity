@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEditor;
 using System.Text;
 
-namespace Emteq.Device.Runtime.Unity
+namespace Emteq.Device.Runtime.UnityEditor
 {
 
 }

@@ -1,7 +1,7 @@
 {	
-	"name": "Emteq.Device.Runtime.Unity",
+	"name": "Emteq.Device.Runtime.UnityEditor",
     "references": [
-        "Emteq.Device.Runtime.Unity.Mobile"
+        "Emteq.Device.Runtime.UnityRuntime"
     ],
     "includePlatforms": [
         "Editor"
