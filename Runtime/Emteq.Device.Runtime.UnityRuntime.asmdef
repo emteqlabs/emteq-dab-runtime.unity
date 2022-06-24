@@ -1,9 +1,11 @@
 {
-    "name": "Emteq.Device.Runtime.Unity.Mobile",
-    "optionalUnityReferences": [],
+    "name": "Emteq.Device.Runtime.UnityRuntime",
+    "rootNamespace": "",
+    "references": [],
     "includePlatforms": [
         "Android",
-        "Editor"
+        "Editor",
+        "WindowsStandalone64"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -11,5 +13,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

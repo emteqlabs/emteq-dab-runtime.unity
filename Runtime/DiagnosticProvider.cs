@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Emteq.Device.Runtime.Unity.Mobile
+namespace Emteq.Device.Runtime.UnityRuntime
 {
 
     public class DiagnosticProvider : MonoBehaviour
