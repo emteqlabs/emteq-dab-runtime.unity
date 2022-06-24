@@ -15,13 +15,11 @@ namespace Emteq.Device.Runtime.Unity.Mobile
       
         public void OnGUI()
         {
-#if UNITY_EDITOR // Does this mean it only shows under the editor?
+//#if UNITY_EDITOR // Does this mean it only shows under the editor?
             GUILayout.Label(emteqLogo);
             GUILayout.Label($"Emteq-Device-Runtime/NativeCall, {verifiedNativeCall}, HasContext, {context != null}");
             GUILayout.Label($"Emteq-Device-Runtime/Api.version, {apiVersion.major}.{apiVersion.minor}.{apiVersion.patch}.{apiVersion.commit} ({apiVersion.describe})");
-
-#endif
-
+//#endif
         }
 
         // Start is called before the first frame update
