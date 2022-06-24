@@ -1,14 +1,30 @@
 using UnityEngine;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Emteq.Device.Runtime.Unity.Mobile
 {
 
-    public class HelloWorld : MonoBehaviour
+    public class DiagnosticProvider : MonoBehaviour
     {
         public void OnGUI()
         {
-            GUILayout.Label("Hello Unity-3d World!!!" + emteq_runtime_helloWorld());
+#if UNITY_EDITOR // Does this mean it only shows under the editor?
+
+            float retVal = -1;
+            try
+            {
+                retVal = emteq_runtime_helloWorld();
+            }
+            finally 
+            { 
+                float expectedRetVal = 1234.568F;
+                bool hasNativeCalls = Math.Abs(retVal-expectedRetVal) < 0.0005;
+                GUILayout.Label($"Emteq-Device-Runtime/HasNative, {hasNativeCalls}");            
+            }
+
+#endif
+
         }
 
         // Start is called before the first frame update
@@ -40,9 +56,7 @@ namespace Emteq.Device.Runtime.Unity.Mobile
 
         void Awake()
         {
-            // Calls the ExamplePluginFunction inside the plugin
-            // And prints 5 to the console
-            print(emteq_runtime_helloWorld());
+
         }
     }
 
