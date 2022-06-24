@@ -40,6 +40,7 @@ namespace Emteq.Device.Runtime
         public UInt16 minor;
         public UInt16 patch;
         public UInt16 commit;
+        public String describe; ///< For ABI compatibility only. e.g "v0.7.4-0-g49012c6"
     }
 
     internal class CApi
@@ -188,6 +189,13 @@ namespace Emteq.Device.Runtime
             , UIntPtr bytesSize
             , int timeoutMs);
 
+        [DllImport(DLL_Path)]
+        internal static extern IoStatus emteq_runtime_writeStream(IntPtr/*CRuntime*/ runtime
+            , StreamHandle descriptor
+            , byte[] bytes
+            , UIntPtr bytesSize
+            , int timeoutMs);
+
     }
 
 
@@ -308,6 +316,20 @@ namespace Emteq.Device.Runtime
             else
                 throw new ApplicationException("Runtime read failed: " + ret.status);
         }
+
+        internal int writeStream(CApi.StreamHandle descriptor, byte[] buffer, int offset, int bytesToWrite, int timeoutMs)
+        {
+            if (offset != 0) throw new Exception("Offset must be 0 at present!");
+
+            CApi.IoStatus ret = CApi.emteq_runtime_writeStream(runtime, descriptor, buffer
+                , (System.UIntPtr)bytesToWrite, timeoutMs);
+
+            if (ret.status == RetVal.EMTEQ_SUCCESS
+                || ret.status == RetVal.EMTEQ_TRYAGAIN)
+                return (int)ret.count;
+            else
+                throw new ApplicationException("Runtime write failed: " + ret.status);
+        }
     }
 
     // Single-producer, single-consumer Fifo byte-stream
@@ -329,10 +351,11 @@ namespace Emteq.Device.Runtime
         }
 
         public override int ReadTimeout { get; set; }
+        public override int WriteTimeout { get; set; }
 
-        public override void Write(byte[] buffer, int offset, int count)
+        public override void Write(byte[] buffer, int offset, int bytesToWrite)
         {
-
+            context.writeStream(descriptor, buffer, offset, bytesToWrite, WriteTimeout);
         }
 
         //public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancel)
