@@ -14,6 +14,7 @@ namespace Emteq.Device.Runtime.UnityRuntime
         bool verifiedNativeCall = false;
         Version apiVersion = default;
         Task contextTask;
+        Task clientTask;
         Stream client;
         bool destroy = false;
         bool clientValid = false;
@@ -28,7 +29,14 @@ namespace Emteq.Device.Runtime.UnityRuntime
             GUILayout.Label(emteqLogo);
             GUILayout.Label($"Emteq-Device-Runtime/NativeCall, {verifiedNativeCall}, HasContext, {context != null}");
             GUILayout.Label($"Emteq-Device-Runtime/Api.version, {apiVersion.major}.{apiVersion.minor}.{apiVersion.patch}.{apiVersion.commit} ({apiVersion.describe})");
-            GUILayout.Label($"Emteq-Device-Runtime/TotalReadSize, {totalReadBytes/1024.0} KiB");
+            if(totalReadBytes > 1024*1024)
+            {
+                GUILayout.Label($"Emteq-Device-Runtime/TotalReadSize, {totalReadBytes/(1024.0*1024.0)} MiB");
+            }
+            else
+            {
+                GUILayout.Label($"Emteq-Device-Runtime/TotalReadSize, {totalReadBytes/1024.0} KiB");
+            }
 //#endif
         }
 
@@ -56,39 +64,43 @@ namespace Emteq.Device.Runtime.UnityRuntime
             // create a client
             client = context.openStream(Emteq.Device.Runtime.StreamId.Raw, 200);
             clientValid = true;
+
+            clientTask = Task.Run(() => {
+                while(!destroy)
+                {
+                    while(clientValid && !destroy)
+                    {
+                        try
+                        {
+                            totalReadBytes += client.Read(dataBuffer, 0, dataBufferSize);
+                        }
+                        catch(Exception e)
+                        {
+                            // if exception raises, close the client
+                            client?.Dispose();
+                            clientValid = false;
+                        }
+                    }
+                    // start new client
+                    if(!destroy)
+                    {
+                        client = context.openStream(Emteq.Device.Runtime.StreamId.Raw, 200);
+                        clientValid = true;
+                    }
+                }
+                client?.Dispose();
+                clientValid = false;
+                context.stop();
+                contextTask.Wait();
+            });
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (Input.touchCount > 0)
+            if (Input.touchCount == 2)
             {
                destroy = true; 
-            }
-            if(!destroy && clientValid)
-            {
-                try
-                {
-                    totalReadBytes += client.Read(dataBuffer, 0, dataBufferSize);
-                }
-                catch(Exception e)
-                {
-                    // if exception raises, close the client
-                    client?.Dispose();
-                    clientValid = false;
-                }
-            }
-            if(destroy)
-            {
-                client?.Dispose();
-                clientValid = false;
-                context.stop();
-                contextTask.Wait();
-            }
-            if(!destroy && !clientValid)
-            {
-                client = context.openStream(Emteq.Device.Runtime.StreamId.Raw, 200);
-                clientValid = true;
             }
         }
 
