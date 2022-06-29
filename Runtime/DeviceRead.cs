@@ -54,13 +54,13 @@ namespace Emteq.Device.Runtime.UnityRuntime
                 if(!verifiedDataRead)
                 {
                      // expected data
-                    Byte[] expectedData = new Byte[256];
+                    byte[] expectedData = new byte[256];
                     for (int i = 0; i < expectedData.Length; i++) { expectedData[i] = BitConverter.GetBytes(i)[0]; }
                     // read data
-                    Byte[] data = new Byte[256];
+                    byte[] data = new byte[256];
                     client.ReadTimeout = 500;
                     Int32 readCount = client.Read(data, 0, data.Length);
-
+                    Console.WriteLine($"Start: I've read {readCount} bytes")
                     if(readCount == data.Length)
                     {
                         verifiedDataRead = true;

@@ -139,7 +139,8 @@ namespace Emteq.Device.Runtime
         [DllImport(DLL_Path)]
         internal static extern float emteq_runtime_helloWorld();
 
-#if true /// @todo How to!?!? UNITY_STANDALONE_WIN
+/// @note: windows sockets handles are unsigned int, linux are signed int
+#if false /// @todo How to!?!? UNITY_STANDALONE_WIN
         [StructLayout(LayoutKind.Sequential)]
         internal struct StreamHandle
         {
@@ -306,12 +307,13 @@ namespace Emteq.Device.Runtime
         internal int readStream(CApi.StreamHandle descriptor, byte[] buffer, int offset, int bytesToRead, int timeoutMs )
         {
             if (offset != 0) throw new Exception("Offset must be 0 at present!");
-
+                
             CApi.IoStatus ret = CApi.emteq_runtime_readStream(runtime, descriptor, buffer
-                , (System.UIntPtr)bytesToRead, timeoutMs );
+                , (System.UIntPtr)bytesToRead, timeoutMs);
+                
 
             if (ret.status == RetVal.EMTEQ_SUCCESS
-                || ret.status == RetVal.EMTEQ_TRYAGAIN )
+                || ret.status == RetVal.EMTEQ_TRYAGAIN)
                 return (int)ret.count;
             else
                 throw new ApplicationException("Runtime read failed: " + ret.status);
@@ -367,7 +369,7 @@ namespace Emteq.Device.Runtime
         
         public override int Read(byte[] buffer, int offset, int bytesToRead)
         {
-            return context.readStream(descriptor, buffer, offset, bytesToRead, ReadTimeout );
+            return context.readStream(descriptor, buffer, offset, bytesToRead, ReadTimeout);
         }
 
         //public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
