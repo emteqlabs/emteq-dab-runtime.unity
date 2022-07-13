@@ -6,7 +6,8 @@ namespace Emteq.Device.Runtime
 {
     public enum RetVal
     {
-          EMTEQ_TRYAGAIN = 1 ///< EWOULDBLOCK, WSAEWOULDBLOCK
+          EMTEQ_CLOSING = 2 ///< Device is being disconnected @note next call will likely error
+        , EMTEQ_TRYAGAIN = 1 ///< EWOULDBLOCK, WSAEWOULDBLOCK
 
         , EMTEQ_SUCCESS = 0 ///< >=0 No-Error, <0 Error
 
@@ -139,7 +140,7 @@ namespace Emteq.Device.Runtime
         [DllImport(DLL_Path)]
         internal static extern float emteq_runtime_helloWorld();
 
-#if true /// @todo How to!?!? UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN
         [StructLayout(LayoutKind.Sequential)]
         internal struct StreamHandle
         {
@@ -313,6 +314,8 @@ namespace Emteq.Device.Runtime
             if (ret.status == RetVal.EMTEQ_SUCCESS
                 || ret.status == RetVal.EMTEQ_TRYAGAIN )
                 return (int)ret.count;
+            if (ret.status == RetVal.EMTEQ_CLOSING)
+                throw new OperationCanceledException("Runtime read closing");
             else
                 throw new ApplicationException("Runtime read failed: " + ret.status);
         }
