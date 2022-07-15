@@ -37,15 +37,18 @@ namespace Emteq.Device.Runtime.UnityRuntime
         public void OnGUI()
         {
             bool isRunning = (contextTask != null) ? contextTask.Status.Equals(TaskStatus.Running) : false;
-
+            
+           // GUILayout.BeginVertical();
             GUILayout.Label(emteqLogo);
             GUILayout.Label($"Emteq-Device-Runtime/NativeCall, {verifiedNativeCall}, HasContext, {context != null}");
             GUILayout.Label($"Emteq-Device-Runtime/Api.version, {apiVersion.major}.{apiVersion.minor}.{apiVersion.patch}.{apiVersion.commit} ({apiVersion.describe})");
 
-            var newEnabled = GUILayout.Toggle(enabled, enabled ? "STOP" : "START");
+            var newEnabled = GUILayout.Toggle(contextEnabled, contextEnabled ? "STOP" : "START"
+                , GUILayout.ExpandWidth(true), GUILayout.Height(50) );
 
             GUILayout.Label($"Emteq-Device-Runtime/Context.running, {isRunning}");
             GUILayout.Label($"Emteq-Device-Runtime/RawStream.open, {rawStream != null}, bytes, {FormatBytes(readBytes)} ");
+            //GUILayout.BeginVertical();
 
             if (newEnabled != contextEnabled)
             {
@@ -58,8 +61,7 @@ namespace Emteq.Device.Runtime.UnityRuntime
                 }
                 else
                 {
-                    Debug.Log("TODO: Support restarting the context runner!");
-                    contextEnabled = false;
+                    contextTask = context.run();
                 }
             }
         }
@@ -85,7 +87,7 @@ namespace Emteq.Device.Runtime.UnityRuntime
             }
 
             context = new Context();
-            await context.run();
+            contextTask = context.run();
         }
 
         void OnDestroy()

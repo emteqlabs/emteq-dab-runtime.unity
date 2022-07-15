@@ -318,6 +318,9 @@ namespace Emteq.Device.Runtime
                 || ret.status == RetVal.EMTEQ_TRYAGAIN)
                 return (int)ret.count;
             else
+            if (ret.status == RetVal.EMTEQ_CLOSING)
+                throw new OperationCanceledException("Runtime Stream closing: Client socket must be closed");
+            else
                 throw new ApplicationException("Runtime read failed: " + ret.status);
         }
 
@@ -334,6 +337,9 @@ namespace Emteq.Device.Runtime
             if (ret.status == RetVal.EMTEQ_SUCCESS
                 || ret.status == RetVal.EMTEQ_TRYAGAIN)
                 return (int)ret.count;
+            else
+            if (ret.status == RetVal.EMTEQ_CLOSING)
+                throw new OperationCanceledException("Runtime Stream closing: Client socket must be closed");
             else
                 throw new ApplicationException("Runtime write failed: " + ret.status);
         }
