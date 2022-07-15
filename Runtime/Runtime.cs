@@ -186,14 +186,14 @@ namespace Emteq.Device.Runtime
         [DllImport(DLL_Path)]
         internal static extern IoStatus emteq_runtime_readStream(IntPtr/*CRuntime*/ runtime
             , StreamHandle descriptor
-            , byte[] bytes
+            , IntPtr bytes
             , UIntPtr bytesSize
             , int timeoutMs);
 
         [DllImport(DLL_Path)]
         internal static extern IoStatus emteq_runtime_writeStream(IntPtr/*CRuntime*/ runtime
             , StreamHandle descriptor
-            , byte[] bytes
+            , IntPtr bytes
             , UIntPtr bytesSize
             , int timeoutMs);
 
@@ -306,26 +306,30 @@ namespace Emteq.Device.Runtime
 
         internal int readStream(CApi.StreamHandle descriptor, byte[] buffer, int offset, int bytesToRead, int timeoutMs )
         {
-            if (offset != 0) throw new Exception("Offset must be 0 at present!");
+            GCHandle pinned_buffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            IntPtr ptr_buffer = pinned_buffer.AddrOfPinnedObject();
 
-            CApi.IoStatus ret = CApi.emteq_runtime_readStream(runtime, descriptor, buffer
-                , (System.UIntPtr)bytesToRead, timeoutMs );
+            CApi.IoStatus ret = CApi.emteq_runtime_readStream(runtime, descriptor, ptr_buffer + offset
+                , (System.UIntPtr)bytesToRead, timeoutMs);
+
+            pinned_buffer.Free();
 
             if (ret.status == RetVal.EMTEQ_SUCCESS
-                || ret.status == RetVal.EMTEQ_TRYAGAIN )
+                || ret.status == RetVal.EMTEQ_TRYAGAIN)
                 return (int)ret.count;
-            if (ret.status == RetVal.EMTEQ_CLOSING)
-                throw new OperationCanceledException("Runtime read closing");
             else
                 throw new ApplicationException("Runtime read failed: " + ret.status);
         }
 
         internal int writeStream(CApi.StreamHandle descriptor, byte[] buffer, int offset, int bytesToWrite, int timeoutMs)
         {
-            if (offset != 0) throw new Exception("Offset must be 0 at present!");
+            GCHandle pinned_buffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            IntPtr ptr_buffer = pinned_buffer.AddrOfPinnedObject();
 
-            CApi.IoStatus ret = CApi.emteq_runtime_writeStream(runtime, descriptor, buffer
+            CApi.IoStatus ret = CApi.emteq_runtime_writeStream(runtime, descriptor, ptr_buffer + offset
                 , (System.UIntPtr)bytesToWrite, timeoutMs);
+
+            pinned_buffer.Free();
 
             if (ret.status == RetVal.EMTEQ_SUCCESS
                 || ret.status == RetVal.EMTEQ_TRYAGAIN)
