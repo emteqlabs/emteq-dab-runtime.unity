@@ -35,13 +35,39 @@ EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isInstance(EmteqRuntime_t* runtim
 */
 EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_create(EmteqRuntime_t* runtime, const size_t sizeOfRuntime );
 
+/** Release resources for a created from `emteq_runtime_create`
+*/
 EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_destroy(EmteqRuntime_t* runtime);
 
-EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_run(EmteqRuntime_t* runtime);
-EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isRunning(EmteqRuntime_t* runtime);
-EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_stop(EmteqRuntime_t* runtime);
-EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isStopping(EmteqRuntime_t* runtime);
+/** Set context options
+ * @param  runtime  Runtime context on which to operate
+ * @param  option   Which option to set
+ * @param  ...      Any required arguments for the specified option
+*/
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_setOption(EmteqRuntime_t* runtime, EmteqOption_t option, ...);
 
+/** Get context options
+ * @param  runtime  Runtime context on which to operate
+ * @param  option   Which option to get
+ * @param  ...      Pointer(s) to store any required arguments for the specified option
+ */
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_getOption(EmteqRuntime_t* runtime, EmteqOption_t option, ...);
+
+/** Blocking update loop until `emteq_runtime_stop()` is called from a separate thread
+*/
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_run(EmteqRuntime_t* runtime);
+
+/** Returns whether `emteq_runtime_run()` is executing on a separate thread
+*/
+EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isRunning(EmteqRuntime_t* runtime);
+
+/** Signals any pending `emteq_runtime_run()` that is running on a separate thread to return
+*/
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_stop(EmteqRuntime_t* runtime);
+
+/** Returns whether a stop is pending which will cause any current/subseqnet call to `emteq_runtime_run()` to return
+*/
+EMTEQ_DEVICE_RUNTIME_EXPORT bool emteq_runtime_isStopping(EmteqRuntime_t* runtime);
 
 /** Set the path at which data can be persisted/cached/saved
 * @param[in]  id   PathId to set
@@ -53,14 +79,16 @@ EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_setDataPath(EmteqRuntime
 */
 EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_getDataPath(EmteqRuntime_t* runtime, const EmteqPathId_t id, const char** path);
 
-
+/** Internal: API test function
+* @returns 1234.5678f
+*/
 EMTEQ_DEVICE_RUNTIME_EXPORT float emteq_runtime_helloWorld();
-
 
 /** Create a new raw read-write socket to the DAB device
 * @note This is  a unix domain socket on compatible platforms
 * @ref https://stackoverflow.com/a/2760267
 * @return Socket descriptor or -1 on failure
+* @see EmteqStreamOpenMode_t for details of options for when stream can be opened
 */
 EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRuntimeSocketStatus_t emteq_runtime_openStream(EmteqRuntime_t* runtime, const EmteqStreamId_t id, const int timeoutMs);
 
