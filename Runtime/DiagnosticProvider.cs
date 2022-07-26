@@ -86,6 +86,10 @@ namespace Emteq.Device.Runtime.UnityRuntime
                 verifiedNativeCall = Math.Abs(helloValue - expectedRetVal) < 0.0005;
             }
 
+            /// @note Options required for C# legacy DLS compatibility
+            Context.setDefault(Option.StreamOpenMode, StreamOpenMode.WhenAttached);
+            Context.setDefault(Option.RxBeginMode, RxBeginMode.OnFirstWrite);
+
             context = new Context();
             contextTask = context.run();
         }
