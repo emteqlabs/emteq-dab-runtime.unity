@@ -44,7 +44,7 @@ EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_destroy(EmteqRuntime_t* 
  * @param  option   Which option to set
  * @param  ...      Any required arguments for the specified option
 */
-EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_setOption(EmteqRuntime_t* runtime, EmteqOption_t option, ...);
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_setOption(EmteqRuntime_t* runtime, enum EmteqOption_t option, ...);
 
 /** Get context options
  * @param  runtime  Runtime context on which to operate

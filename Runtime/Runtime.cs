@@ -15,6 +15,8 @@ namespace Emteq.Device.Runtime
         , EMTEQ_INSUFFICIENT_RESOURCE = -3
         , EMTEQ_INVALID_SOCKET = -4 //< tried read/write operation on non-client socket
 
+        , EMTEQ_NOT_SUPPORTED = -66 //< Operation not supported or unimplemented on this platform 
+
         , EMTEQ_INTERNAL_ERROR = -99
     };
 
@@ -33,6 +35,68 @@ namespace Emteq.Device.Runtime
         Raw = 0
     }
 
+    /** When shall the Client stream be available 
+    * * @see emteq_runtime_openStream
+    */
+    public enum StreamOpenMode
+    {
+        Always = 1, ///< [default] Stream can always be opened before device is attached (will close on removal allowing immediate reopen)
+        WhenAttached = 2, ///< Stream can only be opened after device is attached (will close on removal)
+    };
+
+    /** When shall the device data reads commence
+    */
+    public enum RxBeginMode
+    {
+        OnOpen = 1, ///< [default] rx-transfers commence when a client opens the device stream (@see EmteqStreamOpenMode_t for when client is able to open the stream)
+        OnFirstWrite = 2 ///< rx-transfers commence after first tx-transfer on the stream (client @see emteq_runtime_writeStream)
+    }
+
+    public enum Option
+    {
+#if false ///TODO
+        /**  Set the log message verbosity.
+         *
+	     * If emteq-device-runtime was compiled with verbose debug message logging, this function
+	     * does nothing: you'll always get messages from all levels.
+	     */
+         LogLevel = 0,
+#endif
+
+        /** Specify when shall Client openStream will succeed. 
+         * i.e. Always mode allows open prior to device being attached but WhenAttached will fail to open a stream until device is enumerated.
+         * 
+         * Value shall be provided of type `EmteqStreamOpenMode_t`
+         * 
+         * @see EmteqStreamOpenMode_t
+         */
+        StreamOpenMode = 1,
+
+        /** Specify when shall shall the device data reads commence. 
+         * i.e. OnFirstWrite allows confiruing the device prior to data streaming
+         * 
+         * Value shall be provided of type `EmteqRxBeginMode_t`
+         * 
+         * @see EmteqRxBeginMode_t
+         */
+        RxBeginMode = 2,
+
+        /** This option should be set _before_ calling emteq_runtime_create(), and
+         * specifies the java virtual machine for new calls to
+         * emteq_runtime_create() after the option is set.  The context pointer is
+         * unused.
+         * 
+         * Value shall be provided of type `JavaVM* jvm`
+         * 
+         * Only valid on Android.
+         */
+        Android_JavaVm = 3,
+
+#if false ///TODO
+        StreamReadTimeout = , //< TODO: Support stateful option instead of per-read
+        StreamWriteTimeout = , //< TODO: Support stateful option instead of per-write
+#endif
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct Version
@@ -41,6 +105,8 @@ namespace Emteq.Device.Runtime
         public UInt16 minor;
         public UInt16 patch;
         public UInt16 commit;
+
+        [MarshalAs(UnmanagedType.TBStr)]
         public String describe; ///< For ABI compatibility only. e.g "v0.7.4-0-g49012c6"
     }
 
@@ -77,17 +143,24 @@ namespace Emteq.Device.Runtime
         /** @todo @see `runtime.h`
         */
         [DllImport(DLL_Path)]
-        internal static extern void emteq_api_setJvm(IntPtr jvm);
-
-        /** @todo @see `runtime.h`
-        */
-        [DllImport(DLL_Path)]
         internal static extern Version emteq_api_version();
 
         /** @todo @see `runtime.h`
         */
         [DllImport(DLL_Path)]
         internal static extern String emteq_api_string(RetVal retval);
+
+
+        /** @todo @see `runtime.h`
+        */
+        [DllImport(DLL_Path)]
+        internal static extern RetVal emteq_runtime_setOption(IntPtr/*CRuntime*/ runtime, Option option, __arglist);
+            
+        /** @todo @see `runtime.h`
+         * @todo Do we need: , CallingConvention = CallingConvention.Cdecl
+         */
+        [DllImport(DLL_Path)]
+        internal static extern RetVal emteq_runtime_getOption(IntPtr/*CRuntime*/ runtime, Option option, __arglist);
 
         /** @todo @see `runtime.h`
         */
@@ -140,7 +213,7 @@ namespace Emteq.Device.Runtime
         [DllImport(DLL_Path)]
         internal static extern float emteq_runtime_helloWorld();
 
-#if UNITY_STANDALONE_WIN
+#if false || UNITY_STANDALONE_WIN
         [StructLayout(LayoutKind.Sequential)]
         internal struct StreamHandle
         {
@@ -204,6 +277,19 @@ namespace Emteq.Device.Runtime
     {
         internal CApi.CRuntime runtime = new CApi.CRuntime();
 
+        public static void setDefault<ValueT>(Option option, ValueT value) where ValueT : Enum
+        {
+            int interopValue = Convert.ToInt32(value);
+            handleRetVal(CApi.emteq_runtime_setOption(IntPtr.Zero, option, __arglist(interopValue)), "setOption");
+        }
+
+        public static ValueT getDefault<ValueT>(Option option) where ValueT : Enum
+        {
+            int value = default;
+            handleRetVal(CApi.emteq_runtime_getOption(IntPtr.Zero, option, __arglist(ref value)), "getOption");
+            return (ValueT)Enum.ToObject(typeof(ValueT), value);
+        }
+
         public Context()
         {
             var retVal = CApi.emteq_runtime_create(runtime, CApi.CRuntime.Size);
@@ -241,6 +327,36 @@ namespace Emteq.Device.Runtime
                     throw new Exception("emteq_runtime_destroy failed : " + retVal.ToString());
                 }
             }
+        }
+
+        static private void handleRetVal( RetVal retVal, String tag)
+        {
+            switch (retVal)
+            {
+                case RetVal.EMTEQ_SUCCESS:
+                    break;
+                case RetVal.EMTEQ_INVALID_PARAMETER:
+                    throw new ArgumentOutOfRangeException($"{tag} parameter is invalid : {retVal}" );
+
+                case RetVal.EMTEQ_NOT_SUPPORTED:
+                    throw new InvalidOperationException($"{tag} is not supported : {retVal}");
+
+                default:
+                    throw new Exception($"{tag} set failed: {retVal}");
+            }
+        }
+
+        public void set<ValueT>(Option option, ValueT value) where ValueT : Enum
+        {
+            int interopValue = Convert.ToInt32(value);
+            handleRetVal( CApi.emteq_runtime_setOption(runtime, option, __arglist(interopValue)), "setOption");
+        }
+
+        public ValueT get<ValueT>(Option option) where ValueT : Enum
+        {
+            int value = default;
+            handleRetVal( CApi.emteq_runtime_getOption(runtime, option, __arglist(ref value)), "getOption");
+            return (ValueT)Enum.ToObject(typeof(ValueT), value);
         }
 
         public bool isInstance()

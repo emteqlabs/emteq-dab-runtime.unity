@@ -5,6 +5,7 @@
 #endif
 
 #include <cstdint> //< std::size_t
+#include <exception>
 #include <memory> //< std::unique_ptr
 #include <chrono> //< std::milliseconds
 #include <string_view> //< std::string_view
@@ -12,8 +13,10 @@
 #include "emteq-device-runtime_export.h" //< Cmake generated
 #include "runtime.h" //< C defines reuse for interop
 
-#if 0 //< WIP
-#include "internal/experimental/fdStream.hpp"
+#if __ANDROID__
+/** [Android Only] The JVM is required to access USB subsystem under Android
+*/
+#include <jni.h>
 #endif
 
 namespace emteq {
@@ -43,19 +46,37 @@ namespace runtime {
         Raw = EMTEQ_STREAMID_RAW_DAB
     };
 
+    template<EmteqOption_t option> struct Option { using Value = void; };
+    template<> struct Option<Emteq_Option_StreamOpenMode> { using Value = EmteqStreamOpenMode_t; };
+    template<> struct Option<Emteq_Option_RxBeginMode> { using Value = EmteqRxBeginMode_t; };
+#if __ANDROID__
+    template<> struct Option<Emteq_Option_Android_JavaVm> { using Value = JavaVM*; };
+#endif
+
+
     /**  Context object encapsulates all the global state associated with
     * emteq runtime library
     */
     class EMTEQ_DEVICE_RUNTIME_EXPORT Context final
     {
         struct Impl; //< Pimpl implementation
-    private:
+    public:
 
         /** Magic number to check this is a valid context instance
         * @note This is used for C-interoperability checks where the context is an opaque pointer
         * @note ABI - Value is compiled into client-code
         */
         static constexpr uint32_t MagicTag = 0xEDABC0DE;
+
+        /** Get Global option value used as default for all further contexts
+        */
+        template<EmteqOption_t option>
+        static typename Option<option>::Value getDefault();
+
+        /** Set option value used as default for all further contexts
+        */
+        template<EmteqOption_t option, typename... Value>
+        static void setDefault(Value... value);
 
     public:
 
@@ -77,6 +98,17 @@ namespace runtime {
         */
         inline bool checkTag() const
         { return magicTag_ == MagicTag; }
+
+        /** Get option value */
+        template<EmteqOption_t option>
+        typename Option<option>::Value get()
+        { throw std::domain_error("Option is not supported"); }
+
+        /** Set option value 
+        */
+        template<EmteqOption_t option, typename... Value>
+        void set( Value... value )
+        { throw std::domain_error("Option is not supported"); }
 
         /** Set the path at which data can be persisted/cached/saved
         * @param[in]  id   PathId to set
@@ -187,6 +219,21 @@ namespace runtime {
         std::unique_ptr<Impl> impl_;
         uint32_t magicTag_ = MagicTag; //< @see MagicTag
     };
+
+    /** @see EmteqStreamOpenMode_t
+     */
+    template<> EMTEQ_DEVICE_RUNTIME_EXPORT void Context::set<Emteq_Option_StreamOpenMode>(EmteqStreamOpenMode_t option);
+    template<> EMTEQ_DEVICE_RUNTIME_EXPORT EmteqStreamOpenMode_t Context::get<Emteq_Option_StreamOpenMode>();
+
+    /** @see EmteqRxBeginMode_t
+     */
+    template<> EMTEQ_DEVICE_RUNTIME_EXPORT void Context::set<Emteq_Option_RxBeginMode>(EmteqRxBeginMode_t option);
+    template<> EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRxBeginMode_t Context::get<Emteq_Option_RxBeginMode>();
+
+#if __ANDROID__
+    template<> EMTEQ_DEVICE_RUNTIME_EXPORT void Context::set<Emteq_Option_Android_JavaVm>(JavaVM* jvm);
+    template<> EMTEQ_DEVICE_RUNTIME_EXPORT JavaVM* Context::get<Emteq_Option_Android_JavaVm>();
+#endif
 
 } //END: runtime
 } //END: emteq
