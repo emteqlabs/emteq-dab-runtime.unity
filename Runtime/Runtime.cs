@@ -106,7 +106,7 @@ namespace Emteq.Device.Runtime
         public UInt16 patch;
         public UInt16 commit;
 
-        [MarshalAs(UnmanagedType.TBStr)]
+        [MarshalAs(UnmanagedType.LPStr)]
         public String describe; ///< For ABI compatibility only. e.g "v0.7.4-0-g49012c6"
     }
 
