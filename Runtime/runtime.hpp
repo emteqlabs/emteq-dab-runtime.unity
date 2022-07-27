@@ -46,7 +46,8 @@ namespace runtime {
         Raw = EMTEQ_STREAMID_RAW_DAB
     };
 
-    template<EmteqOption_t option> struct Option { using Value = void; };
+    template<EmteqOption_t option> struct Option;
+    template<> struct Option<Emteq_Option_LogLevel> { using Value = EmteqLogLevel_t; };
     template<> struct Option<Emteq_Option_StreamOpenMode> { using Value = EmteqStreamOpenMode_t; };
     template<> struct Option<Emteq_Option_RxBeginMode> { using Value = EmteqRxBeginMode_t; };
 #if __ANDROID__
@@ -219,6 +220,11 @@ namespace runtime {
         std::unique_ptr<Impl> impl_;
         uint32_t magicTag_ = MagicTag; //< @see MagicTag
     };
+
+    /** @see EmteqLogLevel_t
+     */
+    template<> EMTEQ_DEVICE_RUNTIME_EXPORT void Context::set<Emteq_Option_LogLevel>(EmteqLogLevel_t option);
+    template<> EMTEQ_DEVICE_RUNTIME_EXPORT EmteqLogLevel_t Context::get<Emteq_Option_LogLevel>();
 
     /** @see EmteqStreamOpenMode_t
      */

@@ -52,16 +52,24 @@ namespace Emteq.Device.Runtime
         OnFirstWrite = 2 ///< rx-transfers commence after first tx-transfer on the stream (client @see emteq_runtime_writeStream)
     }
 
+    public enum LogLevel
+    {
+       Verbose = 0, ///< Verbose logging. Should typically be disabled for a release.    
+       Debug = 1, ///< Debug logging. Should typically be disabled for a release.    
+       Info = 2, ///< Informational logging. Should typically be disabled for a release.   
+       Warning = 3, ///< Warning logging. For use with recoverable failures.   
+       Error = 4, ///< Error logging. For use with unrecoverable failures.   
+       Fatal = 5, ///< Fatal logging. For use when aborting.
+    };
+
     public enum Option
     {
-#if false ///TODO
         /**  Set the log message verbosity.
          *
 	     * If emteq-device-runtime was compiled with verbose debug message logging, this function
 	     * does nothing: you'll always get messages from all levels.
 	     */
          LogLevel = 0,
-#endif
 
         /** Specify when shall Client openStream will succeed. 
          * i.e. Always mode allows open prior to device being attached but WhenAttached will fail to open a stream until device is enumerated.
@@ -154,13 +162,13 @@ namespace Emteq.Device.Runtime
         /** @todo @see `runtime.h`
         */
         [DllImport(DLL_Path)]
-        internal static extern RetVal emteq_runtime_setOption(IntPtr/*CRuntime*/ runtime, Option option, __arglist);
-            
+        internal static extern RetVal emteq_runtime_setOption(IntPtr/*CRuntime*/ runtime, Option option, int value);
+
         /** @todo @see `runtime.h`
          * @todo Do we need: , CallingConvention = CallingConvention.Cdecl
          */
         [DllImport(DLL_Path)]
-        internal static extern RetVal emteq_runtime_getOption(IntPtr/*CRuntime*/ runtime, Option option, __arglist);
+        internal static extern RetVal emteq_runtime_getOption(IntPtr/*CRuntime*/ runtime, Option option, ref int value);
 
         /** @todo @see `runtime.h`
         */
@@ -170,7 +178,7 @@ namespace Emteq.Device.Runtime
         /** @todo @see `runtime.h`
         */
         [DllImport(DLL_Path)]
-        internal static extern RetVal emteq_runtime_create(IntPtr/*CRuntime*/ runtime, int/* @todo UIntPtr? for size_t etc*/ sizeOfRuntime );
+        internal static extern RetVal emteq_runtime_create(IntPtr/*CRuntime*/ runtime, int/* @todo UIntPtr? for size_t etc*/ sizeOfRuntime);
 
         /** @todo @see `runtime.h`
         */
@@ -237,7 +245,7 @@ namespace Emteq.Device.Runtime
         */
         [DllImport(DLL_Path)]
         internal static extern StreamStatus emteq_runtime_openStream(IntPtr/*CRuntime*/ runtime, StreamId id, int timeoutMs);
-                
+
         /** @todo @see `runtime.h`
         */
         [DllImport(DLL_Path)]
@@ -280,13 +288,13 @@ namespace Emteq.Device.Runtime
         public static void setDefault<ValueT>(Option option, ValueT value) where ValueT : Enum
         {
             int interopValue = Convert.ToInt32(value);
-            handleRetVal(CApi.emteq_runtime_setOption(IntPtr.Zero, option, __arglist(interopValue)), "setOption");
+            handleRetVal(CApi.emteq_runtime_setOption(IntPtr.Zero, option, interopValue), "setOption");
         }
 
         public static ValueT getDefault<ValueT>(Option option) where ValueT : Enum
         {
             int value = default;
-            handleRetVal(CApi.emteq_runtime_getOption(IntPtr.Zero, option, __arglist(ref value)), "getOption");
+            handleRetVal(CApi.emteq_runtime_getOption(IntPtr.Zero, option, ref value), "getOption");
             return (ValueT)Enum.ToObject(typeof(ValueT), value);
         }
 
@@ -329,14 +337,14 @@ namespace Emteq.Device.Runtime
             }
         }
 
-        static private void handleRetVal( RetVal retVal, String tag)
+        static private void handleRetVal(RetVal retVal, String tag)
         {
             switch (retVal)
             {
                 case RetVal.EMTEQ_SUCCESS:
                     break;
                 case RetVal.EMTEQ_INVALID_PARAMETER:
-                    throw new ArgumentOutOfRangeException($"{tag} parameter is invalid : {retVal}" );
+                    throw new ArgumentOutOfRangeException($"{tag} parameter is invalid : {retVal}");
 
                 case RetVal.EMTEQ_NOT_SUPPORTED:
                     throw new InvalidOperationException($"{tag} is not supported : {retVal}");
@@ -349,13 +357,13 @@ namespace Emteq.Device.Runtime
         public void set<ValueT>(Option option, ValueT value) where ValueT : Enum
         {
             int interopValue = Convert.ToInt32(value);
-            handleRetVal( CApi.emteq_runtime_setOption(runtime, option, __arglist(interopValue)), "setOption");
+            handleRetVal(CApi.emteq_runtime_setOption(runtime, option, interopValue), "set-Option");
         }
 
         public ValueT get<ValueT>(Option option) where ValueT : Enum
         {
             int value = default;
-            handleRetVal( CApi.emteq_runtime_getOption(runtime, option, __arglist(ref value)), "getOption");
+            handleRetVal(CApi.emteq_runtime_getOption(runtime, option, ref value), "get-Option");
             return (ValueT)Enum.ToObject(typeof(ValueT), value);
         }
 
@@ -420,7 +428,7 @@ namespace Emteq.Device.Runtime
         }
 
 
-        internal int readStream(CApi.StreamHandle descriptor, byte[] buffer, int offset, int bytesToRead, int timeoutMs )
+        internal int readStream(CApi.StreamHandle descriptor, byte[] buffer, int offset, int bytesToRead, int timeoutMs)
         {
             GCHandle pinned_buffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
             IntPtr ptr_buffer = pinned_buffer.AddrOfPinnedObject();
@@ -493,10 +501,10 @@ namespace Emteq.Device.Runtime
         //    Write(buffer, offset, count);
         //    return Task.CompletedTask;
         //}
-        
+
         public override int Read(byte[] buffer, int offset, int bytesToRead)
         {
-            return context.readStream(descriptor, buffer, offset, bytesToRead, ReadTimeout );
+            return context.readStream(descriptor, buffer, offset, bytesToRead, ReadTimeout);
         }
 
         //public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
