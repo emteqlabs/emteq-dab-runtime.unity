@@ -6,7 +6,7 @@ namespace Emteq.Device.Runtime
 {
     public enum RetVal
     {
-          EMTEQ_IN_PROGRESS = 3 ///< Success as Asyncronous operation e.g. Runtime-connected but not Device conneciton established
+        EMTEQ_IN_PROGRESS = 3 ///< Success as Asyncronous operation e.g. Runtime-connected but not Device conneciton established
         , EMTEQ_CLOSING = 2 ///< Device is being disconnected @note next call will likely error
         , EMTEQ_TRYAGAIN = 1 ///< EWOULDBLOCK, WSAEWOULDBLOCK
 
@@ -55,12 +55,12 @@ namespace Emteq.Device.Runtime
 
     public enum LogLevel
     {
-       Verbose = 0, ///< Verbose logging. Should typically be disabled for a release.    
-       Debug = 1, ///< Debug logging. Should typically be disabled for a release.    
-       Info = 2, ///< Informational logging. Should typically be disabled for a release.   
-       Warning = 3, ///< Warning logging. For use with recoverable failures.   
-       Error = 4, ///< Error logging. For use with unrecoverable failures.   
-       Fatal = 5, ///< Fatal logging. For use when aborting.
+        Verbose = 0, ///< Verbose logging. Should typically be disabled for a release.    
+        Debug = 1, ///< Debug logging. Should typically be disabled for a release.    
+        Info = 2, ///< Informational logging. Should typically be disabled for a release.   
+        Warning = 3, ///< Warning logging. For use with recoverable failures.   
+        Error = 4, ///< Error logging. For use with unrecoverable failures.   
+        Fatal = 5, ///< Fatal logging. For use when aborting.
     };
 
     public enum Option
@@ -70,7 +70,7 @@ namespace Emteq.Device.Runtime
 	     * If emteq-device-runtime was compiled with verbose debug message logging, this function
 	     * does nothing: you'll always get messages from all levels.
 	     */
-         LogLevel = 0,
+        LogLevel = 0,
 
         /** Specify when shall Client openStream will succeed. 
          * i.e. Always mode allows open prior to device being attached but WhenAttached will fail to open a stream until device is enumerated.
@@ -475,17 +475,45 @@ namespace Emteq.Device.Runtime
     {
         private Context context = null;
         private CApi.StreamHandle descriptor;
+        private bool isOpen = false;
 
         public Stream(Context context, StreamId id, int timeoutMs = -1)
         {
             this.context = context;
-            this.descriptor = context.openStreamHandle(id, timeoutMs);
+            Open(id, timeoutMs);
         }
 
         protected override void Dispose(bool disposing)
         {
-            context.closeRawSocket(descriptor);
+            Close();
             base.Dispose(disposing);
+        }
+
+        public bool IsOpen
+        {
+            get
+            {
+                return isOpen;
+            }
+        }
+
+        public override void Close()
+        {
+            if (isOpen)
+            {
+                context.closeRawSocket(descriptor);
+                isOpen = false;
+            }
+
+        }
+
+        public void Open(StreamId id, int timeoutMs = -1)
+        {
+            if (!isOpen)
+            {
+                descriptor = context.openStreamHandle(id, timeoutMs);
+                isOpen = true;
+            }
         }
 
         public override int ReadTimeout { get; set; }
@@ -493,6 +521,9 @@ namespace Emteq.Device.Runtime
 
         public override void Write(byte[] buffer, int offset, int bytesToWrite)
         {
+            if (!isOpen)
+                throw new ApplicationException("Runtime Write on a closed socket!");
+
             context.writeStream(descriptor, buffer, offset, bytesToWrite, WriteTimeout);
         }
 
@@ -505,6 +536,9 @@ namespace Emteq.Device.Runtime
 
         public override int Read(byte[] buffer, int offset, int bytesToRead)
         {
+            if (!isOpen)
+                throw new ApplicationException("Runtime Read on a closed socket!");
+
             return context.readStream(descriptor, buffer, offset, bytesToRead, ReadTimeout);
         }
 
