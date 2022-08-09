@@ -53,6 +53,11 @@ EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_setOption(EmteqRuntime_t
  */
 EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_getOption(EmteqRuntime_t* runtime, EmteqOption_t option, ...);
 
+/** Perform an update tick
+* @note Normally called in application loop or from inbuilt function `emteq_runtime_run()
+*/
+EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_update(EmteqRuntime_t* runtime, const int timeoutMs);
+
 /** Blocking update loop until `emteq_runtime_stop()` is called from a separate thread
 */
 EMTEQ_DEVICE_RUNTIME_EXPORT EmteqRetval_t emteq_runtime_run(EmteqRuntime_t* runtime);

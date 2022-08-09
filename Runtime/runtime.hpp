@@ -148,13 +148,6 @@ namespace runtime {
         */
         void stop();
 
-        /** Create a new raw read-write socket to the DAB device
-        * @note This is  a unix domain socket on compatible platforms
-        * @ref https://stackoverflow.com/a/2760267
-        * @return Socket descriptor
-        */
-        StreamHandle openStream(const StreamId id);
-
         bool isRawSocket(StreamHandle descriptor);
 
         /** Function for opening client socket

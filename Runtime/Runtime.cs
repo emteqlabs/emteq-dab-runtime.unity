@@ -6,7 +6,8 @@ namespace Emteq.Device.Runtime
 {
     public enum RetVal
     {
-          EMTEQ_CLOSING = 2 ///< Device is being disconnected @note next call will likely error
+          EMTEQ_IN_PROGRESS = 3 ///< Success as Asyncronous operation e.g. Runtime-connected but not Device conneciton established
+        , EMTEQ_CLOSING = 2 ///< Device is being disconnected @note next call will likely error
         , EMTEQ_TRYAGAIN = 1 ///< EWOULDBLOCK, WSAEWOULDBLOCK
 
         , EMTEQ_SUCCESS = 0 ///< >=0 No-Error, <0 Error
